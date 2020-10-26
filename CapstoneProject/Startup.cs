@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Capstone4ShoppingList.Services;
 using CapstoneProject.Context;
 using CapstoneProject.Models;
+using CapstoneProject.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -27,6 +29,9 @@ namespace CapstoneProject
         {
             services.AddControllersWithViews();
             services.AddDbContext<CapstoneShoppingListDBContext>();
+            services.AddSingleton<IDBSetup, DBSetup>();
+            services.AddSingleton<IModelMaker, ModelMaker>();
+            services.AddSingleton<IAddsToCart, AddToCart>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -40,9 +45,8 @@ namespace CapstoneProject
             {
                 app.UseExceptionHandler("/Home/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
+;
             }
-            app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();

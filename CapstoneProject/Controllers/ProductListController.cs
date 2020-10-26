@@ -2,23 +2,30 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 using CapstoneProject.Context;
 using CapstoneProject.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Security.Cryptography.Xml;
+using Capstone4ShoppingList.Services;
+using CapstoneProject.Services;
 
 namespace CapstoneProject.Controllers
 {
     public class ProductListController : Controller
     {
         private readonly CapstoneShoppingListDBContext _context;
-        public DbSet<ShoppingListDetails> shoppingListDetails;
-        public DbSet<ShoppingList> shoppingLists;
-        public DbSet<ProductList> productLists;
-
-        public ProductListController(CapstoneShoppingListDBContext context)
+        private readonly IDBSetup _dbSetup;
+        private readonly IModelMaker _modelMaker;
+        private readonly IAddsToCart _addsToCart;
+        public ProductListController(CapstoneShoppingListDBContext context, IDBSetup setup, IModelMaker modelMaker, IAddsToCart addsToCart)
         {
             _context = context;
+            _dbSetup = setup;
+            _modelMaker = modelMaker;
+            _addsToCart = addsToCart;
         }
 
         // GET: ProductLists
@@ -26,34 +33,10 @@ namespace CapstoneProject.Controllers
         {
             return View(await _context.ProductList.ToListAsync());
         }
-
-        public IActionResult Checkout()
-        {
-            var cart = _context.ShoppingListDetails;
-            var joinShoppingListDetails = (from p in _context.ProductList
-                                           join sd in _context.ShoppingListDetails
-                                           on p.Id equals sd.ProductId
-                                           select p.Product).ToList();
-
-            var shoppingListDetails = new ShoppingListDetails();
-            //shoppingListDetails.joinShoppingListDetails = joinShoppingListDetails;
-           return View(joinShoppingListDetails);
-        }
-
-
         public IActionResult AddToCart(int Id)
         {
             var product = _context.ProductList.FirstOrDefault(_ => _.Id == Id);
-            var shoppingListDetails = new ShoppingListDetails();
-
-            shoppingListDetails.ProductId = product.Id;
-            shoppingListDetails.Quantity = 1;
-            shoppingListDetails.Price = product.Price;
-            shoppingListDetails.Product = product;
-
-            _context.ShoppingListDetails.Add(shoppingListDetails);
-            _context.SaveChanges();
-
+            _addsToCart.AddToCart(_context, Id);
             return View(product);
         }
 
@@ -79,6 +62,11 @@ namespace CapstoneProject.Controllers
         public IActionResult Create()
         {
             return View();
+        }
+        public IActionResult Checkout()
+        {
+            var checkout = _modelMaker.MakeModel(_context);
+            return View(checkout);
         }
 
         // POST: ProductLists/Create

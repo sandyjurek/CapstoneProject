@@ -3,6 +3,7 @@
     ViewData["Title"] = "AddToCart";
 }
 @model ProductList
+<body style="background-color:antiquewhite">
 
 <h1>AddToCart</h1>
 
@@ -10,7 +11,9 @@
     @Model.Product has been added to your shopping list!
 </p>
 <div>
-    <form asp-action="Index">
-        <input type="submit" value="Add more products" />
+    <form>
+        <input type="submit" asp-action="Index" value="Add more products" />
+        <input type="submit" asp-action="Checkout" value="Proceed to Checkout" />
     </form>
 </div>
+</body>

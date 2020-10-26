@@ -1,20 +1,40 @@
-﻿@model IEnumerable<CapstoneProject.Models.ShoppingListDetails>
+﻿
 @{
-    ViewData["Title"] = "Checkout";
+    ViewData["Title"] = "Cart";
 }
+@model CheckoutModel
 
-<h1>Checkout</h1>
+<h1>Cart</h1>
 
-<table class="table">
-    @foreach (var item in Model)
+<table>
+    <tr>
+        <th>
+            Product
+        </th>
+        <th>
+            Price
+        </th>
+    </tr>
+
+    @foreach (var item in Model.Items)
     {
         <tr>
-            <td>@Html.DisplayFor(modelItem => item.Id)</td>
-            <td>@Html.DisplayFor(modelItem => item.ProductId)</td>
-            <td>@Html.DisplayFor(modelItem => item.Quantity)</td>
-            <td>@Html.DisplayFor(modelItem => item.Price)</td>
-
-            <td><a asp-action="Delete" asp-route-id="@item.Id">Delete</a></td>
+            <td style="width:80px">@Html.DisplayFor(modelItem => item.Product)</td>
+            <td>@String.Format("{0:c}", item.Price)</td>
         </tr>
     }
 </table>
+
+<div>
+    <label><b>Subtotal:</b></label>
+    @String.Format("{0:c}", Model.Total)
+</div>
+<div>
+    <label><b>Tax: 6%</b></label>
+    @String.Format("{0:c}", Model.Tax)
+
+</div>
+<div>
+    <label><b>Total:</b></label>
+    @String.Format("{0:c}", Model.GrandTotal)
+</div>
